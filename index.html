@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sales Channel Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { // Deep Blue theme base
+              DEFAULT: '#1A374D', // Deep sophisticated blue
+              light: '#406882',   // Lighter shade for hover/accents
+              dark: '#0D1F2B',    // Darker shade
+            },
+            secondary: { // Gold accent (remains the same)
+              DEFAULT: '#b08d57',
+              light: '#c8a876',
+              dark: '#98753f',
+            },
+            accent: { 
+               DEFAULT: '#d4af37', 
+            },
+            background: '#ffffff', // Main content background
+            surface: '#f8fafc', // Slightly off-white for cards/modals (slate-50)
+            textPrimary: '#1f2937', // slate-800 For text on light backgrounds
+            textSecondary: '#4b5563', // slate-600 For less important text on light backgrounds
+            textOnPrimary: '#f8fafc', // slate-50 Text on dark primary backgrounds (new blue)
+            textOnSecondary: '#ffffff', // Text on gold buttons (usually white)
+            borderLight: '#e5e7eb', // gray-200 Light border color
+            borderDark: '#525252',  // neutral-600 Darker border for inputs on dark bg if any
+          },
+          fontFamily: {
+            sans: ['Lato', 'sans-serif'], // Lato for body text
+            serif: ['Poppins', 'serif'], // Poppins for headings/display (using serif key for existing structure)
+          },
+        }
+      }
+    }
+  </script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.1.0",
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.1.0"
+  }
+}
+</script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html><link rel="stylesheet" href="index.css">
+<script src="index.tsx" type="module"></script>

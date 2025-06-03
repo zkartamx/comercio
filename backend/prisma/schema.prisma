@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Enum para roles de usuario
+enum Role {
+  admin
+  seller
+  customer
+}
+
+// Enum para estados de solicitud de producto
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(customer)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders          Order[]
+  productRequests ProductRequest[] @relation("SellerProductRequests") // Solicitudes hechas por este usuario (vendedor)
+
+  salesMade              Sale[]  @relation("SellerSales") // Referencia al modelo Sale
+  username               String? @unique
+  defaultShippingAddress Json?
+  defaultBillingDetails  Json?
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  stock       Int
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  orderItems      OrderItem[]
+  productRequests ProductRequest[] // Solicitudes de este producto
+  saleItems       SaleItem[] // Productos vendidos a través de SaleItem
+}
+
+model ProductRequest {
+  id                Int           @id @default(autoincrement())
+  productId         Int
+  product           Product       @relation(fields: [productId], references: [id])
+  requestedById     Int // Quién (qué User ID) hizo la solicitud (debería ser un vendedor)
+  requestedBy       User          @relation("SellerProductRequests", fields: [requestedById], references: [id])
+  quantityRequested Int
+  status            RequestStatus @default(PENDING)
+  notes             String? // Notas del solicitante
+  adminNotes        String? // Notas del administrador al aprobar/rechazar/etc.
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@map("productrequest")
+}
+
+model OrderItem {
+  id           Int      @id @default(autoincrement())
+  order        Order    @relation(fields: [orderId], references: [id])
+  orderId      Int
+  product      Product  @relation(fields: [productId], references: [id])
+  productId    Int
+  productName  String // Nombre del producto al momento de la compra
+  quantity     Int
+  priceAtOrder Float // Precio del producto al momento de la compra
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+}
+
+model Order {
+  id               Int         @id @default(autoincrement())
+  user             User?       @relation(fields: [userId], references: [id]) // userId ahora es opcional
+  userId           Int?
+  customerName     String // Nombre del cliente (si no es un usuario registrado)
+  customerEmail    String // Email del cliente (si no es un usuario registrado)
+  items            OrderItem[]
+  totalAmount      Float
+  paymentStatus    String // Ej: "UNPAID", "PAID", "PENDING_PAYMENT"
+  status           String // Ej: "PENDING_CONFIRMATION", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELED"
+  shippingAddress  Json // Dirección de envío
+  billingRequested Boolean     @default(false)
+  billingDetails   Json? // Detalles de facturación (opcional)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+}
+
+// Modelo para el registro general de la venta
+model Sale {
+  id          Int      @id @default(autoincrement())
+  seller      User     @relation("SellerSales", fields: [sellerId], references: [id])
+  sellerId    Int
+  totalAmount Float
+  notes       String? // Notas adicionales para la venta
+  saleDate    DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items SaleItem[] // Artículos individuales de esta venta
+
+  @@map("sale")
+}
+
+// Modelo para cada artículo dentro de una venta
+model SaleItem {
+  id        Int      @id @default(autoincrement())
+  sale      Sale     @relation(fields: [saleId], references: [id])
+  saleId    Int
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int
+  unitPrice Float // Precio por unidad al momento de la venta
+  createdAt DateTime @default(now())
+}

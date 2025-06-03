@@ -1,0 +1,46 @@
+### Registro de usuario
+POST http://localhost:4000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "nuevo@ejemplo.com",
+  "password": "password123",
+  "name": "Nuevo Usuario",
+  "role": "customer"
+}
+
+### Login de usuario
+POST http://localhost:4000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "nuevo@ejemplo.com",
+  "password": "password123"
+}
+
+### Listar productos
+GET http://localhost:4000/api/products
+
+### Crear producto (admin)
+POST http://localhost:4000/api/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Producto Test",
+  "description": "Descripción de prueba",
+  "price": 99.99,
+  "stock": 10
+}
+
+### Crear pedido
+POST http://localhost:4000/api/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "productId": 1,
+  "quantity": 2,
+  "status": "pending"
+}
