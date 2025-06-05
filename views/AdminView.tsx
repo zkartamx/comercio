@@ -120,9 +120,6 @@ const AdminView: React.FC<AdminViewProps> = ({
   const [isDeleteSellerConfirmModalOpen, setIsDeleteSellerConfirmModalOpen] = useState(false);
   const [deletingSellerInfo, setDeletingSellerInfo] = useState<{ id: string, name: string, username: string } | null>(null);
 
-  const [orderSearchTerm, setOrderSearchTerm] = useState('');
-  const [salesSearchTerm, setSalesSearchTerm] = useState('');
-
 
   const handleNewProductInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -457,15 +454,26 @@ const AdminView: React.FC<AdminViewProps> = ({
   }
 
   const renderProductRequests = () => {
+    console.log('Product requests data in AdminView:', productRequests);
     if (!productRequests || productRequests.length === 0) {
       return <p className="text-textSecondary text-center py-5">{t('noProductRequests')}</p>;
     }
     return (
       <div className="space-y-6">
-        {productRequests.map((req) => {
-          // Ensure req.status is treated as a string, default to PENDING if null/undefined, then uppercase.
-          const incomingStatusUpper = String(req.status ?? RequestStatus.PENDING).toUpperCase();
-          let normalizedStatus: RequestStatus;
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder={t('searchProductRequestsPlaceholder' as TranslationKey)}
+            value={requestSearchTerm}
+            onChange={(e) => setRequestSearchTerm(e.target.value)}
+            className="w-full p-3 border border-borderLight rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow shadow-sm"
+          />
+        </div>
+        {filteredProductRequests && filteredProductRequests.length > 0 ? (
+          filteredProductRequests.map((req) => {
+            // Ensure req.status is treated as a string, default to PENDING if null/undefined, then uppercase.
+            const incomingStatusUpper = String(req.status ?? RequestStatus.PENDING).toUpperCase();
+            let normalizedStatus: RequestStatus;
 
           const foundEnumValue = (Object.values(RequestStatus) as RequestStatus[]).find(
             value => value.toUpperCase() === incomingStatusUpper
@@ -513,7 +521,10 @@ const AdminView: React.FC<AdminViewProps> = ({
               </div>
             </div>
           );
-        })}
+        })
+        ) : (
+          <p className="text-textSecondary text-center py-5">{t('noProductRequests')}</p>
+        )}
       </div>
     );
   };

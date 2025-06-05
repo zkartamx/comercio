@@ -56,6 +56,7 @@ export const translations = {
   storeName: 'Nombre de la Tienda',
   viewCart: 'Ver Carrito',
   searchProductsPlaceholder: 'Buscar productos...',
+  searchProductRequestsPlaceholder: 'Buscar solicitudes por ID, vendedor, producto...',
   shoppingCartTitle: 'Carrito de Compras',
   cartEmpty: 'Tu carrito está vacío.',
   decreaseQuantity: 'Disminuir cantidad',
