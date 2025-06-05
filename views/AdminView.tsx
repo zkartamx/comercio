@@ -120,6 +120,33 @@ const AdminView: React.FC<AdminViewProps> = ({
   const [isDeleteSellerConfirmModalOpen, setIsDeleteSellerConfirmModalOpen] = useState(false);
   const [deletingSellerInfo, setDeletingSellerInfo] = useState<{ id: string, name: string, username: string } | null>(null);
 
+  const [orderSearchTerm, setOrderSearchTerm] = useState('');
+  const [salesSearchTerm, setSalesSearchTerm] = useState('');
+  const [requestSearchTerm, setRequestSearchTerm] = useState('');
+
+  const filteredProductRequests = useMemo(() => {
+    if (!productRequests) return []; // Guard clause for undefined productRequests
+    const term = requestSearchTerm.toLowerCase();
+    return productRequests.filter(req => {
+      const id = typeof req.id === 'string' ? req.id.toLowerCase() : '';
+      const sellerId = typeof req.sellerId === 'string' ? req.sellerId.toLowerCase() : '';
+      const sellerName = req.requestedBy?.name?.toLowerCase() || '';
+      const productName = req.product?.name?.toLowerCase() || '';
+      const quantity = String(req.quantityRequested);
+      const createdAtStr = typeof req.createdAt === 'string' ? req.createdAt.toLowerCase() : '';
+      const notes = req.notes?.toLowerCase() || '';
+      return (
+        (id && id.includes(term)) ||
+        (sellerId && sellerId.includes(term)) ||
+        sellerName.includes(term) ||
+        productName.includes(term) ||
+        quantity.includes(term) ||
+        (createdAtStr && createdAtStr.includes(term)) ||
+        notes.includes(term)
+      );
+    });
+  }, [productRequests, requestSearchTerm]);
+
 
   const handleNewProductInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -277,7 +304,7 @@ const AdminView: React.FC<AdminViewProps> = ({
   
   const cardBaseClasses = "p-5 bg-surface rounded-xl shadow-lg border border-borderLight";
   const selectClasses = "p-2 border border-borderLight rounded-lg text-sm focus:ring-2 focus:ring-secondary focus:border-secondary text-textPrimary bg-white";
-  const inputClasses = "mt-1 block w-full px-3 py-2 border border-borderLight rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm bg-white text-textPrimary placeholder-textSecondary";
+  const inputClasses = "w-full p-3 border border-borderLight rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow shadow-sm placeholder-textSecondary text-textPrimary bg-white";
   const labelClasses = "block text-sm font-medium text-textSecondary";
   const primaryButtonClasses = "px-6 py-3 bg-secondary hover:bg-secondary-dark text-textOnSecondary font-semibold rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-secondary-light focus:ring-opacity-75 disabled:bg-slate-400 disabled:shadow-none disabled:scale-100 disabled:cursor-not-allowed";
   const secondaryButtonClasses = "px-4 py-2 text-sm font-medium text-textPrimary bg-slate-100 hover:bg-slate-200 rounded-lg border border-borderLight shadow-sm hover:shadow-md transition-colors disabled:bg-slate-300";
@@ -466,7 +493,7 @@ const AdminView: React.FC<AdminViewProps> = ({
             placeholder={t('searchProductRequestsPlaceholder' as TranslationKey)}
             value={requestSearchTerm}
             onChange={(e) => setRequestSearchTerm(e.target.value)}
-            className="w-full p-3 border border-borderLight rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow shadow-sm"
+            className={inputClasses}
           />
         </div>
         {filteredProductRequests && filteredProductRequests.length > 0 ? (
