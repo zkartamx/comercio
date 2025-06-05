@@ -124,12 +124,12 @@ const AdminView: React.FC<AdminViewProps> = ({
   const filteredProductRequests = useMemo(() => {
     const term = requestSearchTerm.toLowerCase();
     return productRequests.filter(req => {
-      const id = req.id?.toLowerCase();
-      const sellerId = req.sellerId?.toLowerCase();
+      const id = typeof req.id === 'string' ? req.id.toLowerCase() : '';
+      const sellerId = typeof req.sellerId === 'string' ? req.sellerId.toLowerCase() : '';
       const sellerName = req.requestedBy?.name?.toLowerCase() || '';
       const productName = req.product?.name?.toLowerCase() || '';
       const quantity = String(req.quantityRequested);
-      const date = req.createdAt?.toLowerCase();
+      const createdAtStr = typeof req.createdAt === 'string' ? req.createdAt.toLowerCase() : '';
       const notes = req.notes?.toLowerCase() || '';
       return (
         (id && id.includes(term)) ||
@@ -137,7 +137,7 @@ const AdminView: React.FC<AdminViewProps> = ({
         sellerName.includes(term) ||
         productName.includes(term) ||
         quantity.includes(term) ||
-        (date && date.includes(term)) ||
+        (createdAtStr && createdAtStr.includes(term)) ||
         notes.includes(term)
       );
     });
