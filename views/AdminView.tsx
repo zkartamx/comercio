@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Order, SaleRecord, ProductRequest, Product, OrderStatus, RequestStatus, SaleSource, TranslationKey, User, Role, PaymentStatus } from '../types';
 import Modal from '../components/Modal';
 
@@ -119,6 +119,9 @@ const AdminView: React.FC<AdminViewProps> = ({
   const [sellerFormError, setSellerFormError] = useState<string>('');
   const [isDeleteSellerConfirmModalOpen, setIsDeleteSellerConfirmModalOpen] = useState(false);
   const [deletingSellerInfo, setDeletingSellerInfo] = useState<{ id: string, name: string, username: string } | null>(null);
+
+  const [orderSearchTerm, setOrderSearchTerm] = useState('');
+  const [salesSearchTerm, setSalesSearchTerm] = useState('');
 
 
   const handleNewProductInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -283,10 +286,58 @@ const AdminView: React.FC<AdminViewProps> = ({
   const secondaryButtonClasses = "px-4 py-2 text-sm font-medium text-textPrimary bg-slate-100 hover:bg-slate-200 rounded-lg border border-borderLight shadow-sm hover:shadow-md transition-colors disabled:bg-slate-300";
   const dangerButtonClasses = "px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm hover:shadow-md transition-colors disabled:bg-red-400 disabled:cursor-not-allowed";
 
+  const filteredOrders = useMemo(() => {
+    const term = orderSearchTerm.toLowerCase();
+    return orders.filter(order => {
+      const itemsNames = order.items.map(i => i.productName.toLowerCase()).join(' ');
+      const quantities = order.items.reduce((sum, i) => sum + i.quantity, 0).toString();
+      const dateStr = new Date(order.createdAt).toLocaleDateString('es-MX').toLowerCase();
+      return (
+        order.id.toLowerCase().includes(term) ||
+        order.customerName.toLowerCase().includes(term) ||
+        order.customerEmail.toLowerCase().includes(term) ||
+        (order.userId && String(order.userId).includes(term)) ||
+        dateStr.includes(term) ||
+        quantities.includes(term) ||
+        order.totalAmount.toString().includes(term) ||
+        order.paymentStatus.toLowerCase().includes(term) ||
+        itemsNames.includes(term)
+      );
+    });
+  }, [orders, orderSearchTerm]);
+
+  const filteredSales = useMemo(() => {
+    const term = salesSearchTerm.toLowerCase();
+    return sales.filter(sale => {
+      const itemsNames = sale.items.map(i => (i.product?.name || '').toLowerCase()).join(' ');
+      const quantities = sale.items.reduce((sum, i) => sum + i.quantity, 0).toString();
+      const dateStr = new Date(sale.saleDate).toLocaleDateString('es-MX').toLowerCase();
+      return (
+        sale.id.toLowerCase().includes(term) ||
+        sale.source.toLowerCase().includes(term.replace(/\s+/g, '')) ||
+        sale.totalAmount.toString().includes(term) ||
+        (sale.notes && sale.notes.toLowerCase().includes(term)) ||
+        quantities.includes(term) ||
+        dateStr.includes(term) ||
+        itemsNames.includes(term)
+      );
+    });
+  }, [sales, salesSearchTerm]);
+
   const renderOrders = () => (
     <div className="space-y-6">
+      <input
+        type="text"
+        placeholder={t('searchOrdersPlaceholder')}
+        value={orderSearchTerm}
+        onChange={e => setOrderSearchTerm(e.target.value)}
+        className={inputClasses}
+      />
       {orders.length === 0 && <p className="text-textSecondary text-center py-5">{t('noCustomerOrders')}</p>}
-      {orders.map(order => (
+      {orders.length > 0 && filteredOrders.length === 0 && (
+        <p className="text-textSecondary text-center py-5">{t('noResultsFound')}</p>
+      )}
+      {filteredOrders.map(order => (
         <div key={order.id} className={cardBaseClasses}>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
             <div>
@@ -363,11 +414,20 @@ const AdminView: React.FC<AdminViewProps> = ({
   );
 
   const renderSales = () => {
-    console.log('AdminView sales data:', JSON.stringify(sales, null, 2));
     return (
       <div className="space-y-6">
+        <input
+          type="text"
+          placeholder={t('searchSalesPlaceholder')}
+          value={salesSearchTerm}
+          onChange={e => setSalesSearchTerm(e.target.value)}
+          className={inputClasses}
+        />
         {sales.length === 0 && <p className="text-textSecondary text-center py-5">{t('noSalesRecords')}</p>}
-        {sales.map(sale => (
+        {sales.length > 0 && filteredSales.length === 0 && (
+          <p className="text-textSecondary text-center py-5">{t('noResultsFound')}</p>
+        )}
+        {filteredSales.map(sale => (
           <div key={sale.id} className={cardBaseClasses}>
             <h4 className="font-serif font-semibold text-xl text-secondary">{t('saleIdLabel')} {sale.id}</h4>
             <p className="text-sm text-textSecondary mt-1">{t('dateLabel')} {new Date(sale.saleDate).toLocaleString('es-MX')}</p>
@@ -397,7 +457,6 @@ const AdminView: React.FC<AdminViewProps> = ({
   }
 
   const renderProductRequests = () => {
-    console.log('Product requests data in AdminView:', productRequests);
     if (!productRequests || productRequests.length === 0) {
       return <p className="text-textSecondary text-center py-5">{t('noProductRequests')}</p>;
     }

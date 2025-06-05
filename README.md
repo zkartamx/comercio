@@ -21,7 +21,8 @@ Sales Channel Pro es una aplicación web diseñada para gestionar un canal de ve
     *   Solicitud de reposición de stock de productos.
 *   **Panel de Administración (Requiere Autenticación):**
     *   Visualización y gestión del estado de pedidos de clientes (incluyendo estado de pago).
-    *   Visualización de ventas de vendedores.
+*   Visualización de ventas de vendedores.
+*   Búsqueda y filtrado en pedidos de clientes y ventas de vendedores para agilizar la revisión.
     *   Gestión de solicitudes de productos de vendedores (aprobación/rechazo/surtido).
     *   Gestión de Productos (CRUD):
         *   Agregar nuevos productos al catálogo.

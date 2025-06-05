@@ -134,11 +134,14 @@ Tu pedido será procesado una vez que se confirme el pago.`,
   adminWelcome: 'Bienvenido, {adminName}',
   customerOrders: 'Pedidos de Clientes',
   sellerSales: 'Ventas de Vendedores',
+  searchOrdersPlaceholder: 'Buscar pedidos...',
+  searchSalesPlaceholder: 'Buscar ventas...',
   productRequests: 'Solicitudes de Productos',
   salesSummaryAI: 'Resumen de Ventas (IA)',
   noCustomerOrders: 'Aún no hay pedidos de clientes.',
   customerLabel: 'Cliente:', // Changed
   noSalesRecords: 'Aún no hay registros de ventas.',
+  noResultsFound: 'No se encontraron resultados.',
   saleIdLabel: 'ID de Venta:', // Changed
   sourceLabel: 'Fuente:', // Changed
   itemsSold: 'Artículos Vendidos:',
