@@ -293,7 +293,7 @@ const AdminView: React.FC<AdminViewProps> = ({
       const quantities = order.items.reduce((sum, i) => sum + i.quantity, 0).toString();
       const dateStr = new Date(order.createdAt).toLocaleDateString('es-MX').toLowerCase();
       return (
-        order.id.toLowerCase().includes(term) ||
+        (typeof order.id === 'string' ? order.id.toLowerCase() : '').includes(term) ||
         order.customerName.toLowerCase().includes(term) ||
         order.customerEmail.toLowerCase().includes(term) ||
         (order.userId && String(order.userId).includes(term)) ||
